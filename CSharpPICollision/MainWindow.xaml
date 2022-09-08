@@ -1,0 +1,23 @@
+﻿<Window x:Class="CSharpPICollision.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CSharpPICollision"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" MouseMove="viewport_MouseMove" Background="White" MouseDown="Window_MouseDown">
+    <Grid>
+        <Viewport3D Name="viewport">
+            <Viewport3D.Camera>
+                <PerspectiveCamera Position="0 0 -20" LookDirection="0 0 1" x:Name="camera" FarPlaneDistance="50"/>
+            </Viewport3D.Camera>
+            <Viewport3D.Children>
+                <ModelVisual3D>
+                    <ModelVisual3D.Content>
+                        <DirectionalLight Color="White" Direction="0,-1,0"/>
+                    </ModelVisual3D.Content>
+                </ModelVisual3D>
+            </Viewport3D.Children>
+        </Viewport3D>
+    </Grid>
+</Window>
