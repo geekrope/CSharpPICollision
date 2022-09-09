@@ -7,14 +7,26 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" MouseMove="viewport_MouseMove" Background="White" MouseDown="Window_MouseDown">
     <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="#FF0F2027"/>
+                <GradientStop Color="#FF2C5364" Offset="1"/>
+                <GradientStop Color="#FF203A43" Offset="0.5"/>
+            </LinearGradientBrush>
+        </Grid.Background>
         <Viewport3D Name="viewport">
             <Viewport3D.Camera>
-                <PerspectiveCamera Position="0 0 -20" LookDirection="0 0 1" x:Name="camera" FarPlaneDistance="50"/>
+                <PerspectiveCamera Position="0 0 -20" LookDirection="0 0 1" x:Name="camera" FarPlaneDistance="100"/>
             </Viewport3D.Camera>
             <Viewport3D.Children>
                 <ModelVisual3D>
                     <ModelVisual3D.Content>
-                        <DirectionalLight Color="White" Direction="0,-1,0"/>
+                        <DirectionalLight Color="White" Direction="0,-1,0"/>                        
+                    </ModelVisual3D.Content>
+                </ModelVisual3D>
+                <ModelVisual3D>
+                    <ModelVisual3D.Content>
+                        <DirectionalLight Color="White" Direction="-1,0,0"/>
                     </ModelVisual3D.Content>
                 </ModelVisual3D>
             </Viewport3D.Children>

@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Linq;
 using System.Windows.Threading;
 using System.Windows.Documents;
+using System.Reflection.Metadata;
 
 namespace CSharpPICollision
 {
@@ -432,12 +433,23 @@ namespace CSharpPICollision
         private Dictionary<VisualObject, ModelVisual3D> _scene;
         private Viewport3D _viewport3D;
         private CameraController _cameraController;
-        private readonly DiffuseMaterial _blockMaterial;
-        private readonly Size3D _wallSize = new Size3D(1, 10, 10);
+
+        private readonly MaterialGroup _blockMaterial;
+        private readonly DiffuseMaterial _wallMaterial;
+        private readonly DiffuseMaterial _gridMaterial;
+        private readonly Size3D _wallSize = new Size3D(1, 4, 4);
 
         private double _scalar
         {
             get => 1;
+        }
+        private double _thickness
+        {
+            get => 0.02;
+        }
+        private double _gridSize
+        {
+            get => 0.5;
         }
 
         public CameraController CameraController
@@ -449,21 +461,32 @@ namespace CSharpPICollision
         {
             return new ModelVisual3D() { Content = new GeometryModel3D(mesh, material) { BackMaterial = material } };
         }
+        private ModelVisual3D GetModelVisual3D(Material material, params MeshGeometry3D[] meshes)
+        {
+            var collection = new Model3DGroup();
 
-        private MeshGeometry3D GetBox(Size3D size)
+            foreach (var mesh in meshes)
+            {
+                collection.Children.Add(new GeometryModel3D(mesh, material));
+            }
+
+            return new ModelVisual3D() { Content = collection };
+        }
+
+        private MeshGeometry3D GetBox(Size3D size, Point3D position = new Point3D())
         {
             return new MeshGeometry3D()
             {
                 Positions =
                 {
-                    new Point3D(0,0,0),
-                    new Point3D(size.X, 0, 0),
-                    new Point3D(0, size.Y, 0),
-                    new Point3D(size.X, size.Y, 0),
-                    new Point3D(0, 0, size.Z),
-                    new Point3D(size.X, 0, size.Z),
-                    new Point3D(0, size.Y, size.Z),
-                    new Point3D(size.X, size.Y, size.Z),
+                    new Point3D(position.X, position.Y, position.Z),
+                    new Point3D(size.X + position.X, position.Y, position.Z),
+                    new Point3D(position.X, size.Y + position.Y, position.Z),
+                    new Point3D(size.X + position.X, size.Y + position.Y, position.Z),
+                    new Point3D(position.X, position.Y, size.Z + position.Z),
+                    new Point3D(size.X + position.X, position.Y, size.Z + position.Z),
+                    new Point3D(position.X, size.Y + position.Y, size.Z + position.Z),
+                    new Point3D(size.X + position.X, size.Y + position.Y, size.Z + position.Z),
                 },
                 TriangleIndices =
                 {
@@ -473,22 +496,13 @@ namespace CSharpPICollision
                 }
             };
         }
-        private MeshGeometry3D GetHorizontalPlane(double size, double yOffset)
+        private IEnumerable<MeshGeometry3D> GetHorizontalPlane(double size, double yOffset)
         {
-            return new MeshGeometry3D()
+            for (double offset = -size / 2; offset < size / 2; offset += _gridSize)
             {
-                Positions =
-                {
-                    new Point3D(-size / 2, yOffset, -size / 2),
-                    new Point3D(size / 2, yOffset, -size / 2),
-                    new Point3D(size / 2, yOffset, size / 2),
-                    new Point3D(-size / 2, yOffset, size / 2)
-                },
-                TriangleIndices =
-                {
-                    0, 1, 2, 2, 3, 0
-                }
-            };
+                yield return GetBox(new Size3D(_thickness, _thickness, size), new Point3D(offset - _thickness / 2, -_thickness + yOffset, -size / 2));
+                yield return GetBox(new Size3D(size, _thickness, _thickness), new Point3D(-size / 2, -_thickness + yOffset, offset - _thickness / 2));
+            }
         }
 
         private Transform3D GetBoxTransform(Block block)
@@ -497,16 +511,21 @@ namespace CSharpPICollision
 
             return new TranslateTransform3D(position.X, position.Y, position.Z);
         }
-        private Transform3D GetWallTransform(Wall wall)
-        {
-            var position = GetWallPosition(wall);
-
-            return new TranslateTransform3D(position.X - _wallSize.X, position.Y - _wallSize.Y / 2, position.Z - _wallSize.Z/2);
-        }
 
         private Size3D GetBoxSize(Block block)
         {
             return new Size3D(block.Size * _scalar, block.Size * _scalar, block.Size * _scalar);
+        }
+
+        private MaterialGroup GetEmissiveMaterial(Brush brush)
+        {
+            return new MaterialGroup()
+            {
+                Children = {
+                    new DiffuseMaterial(brush),
+                    new EmissiveMaterial(brush),
+                }
+            };
         }
 
         private ModelVisual3D GetModel3D(VisualObject obj)
@@ -514,8 +533,8 @@ namespace CSharpPICollision
             return obj.Value switch
             {
                 Block block => GetModelVisual3D(GetBox(GetBoxSize(block)), _blockMaterial),
-                Wall wall => GetModelVisual3D(GetBox(_wallSize), _blockMaterial),
-                HorizontalAxis axis => GetModelVisual3D(GetHorizontalPlane(CameraController.Camera.FarPlaneDistance, GetAxisPosition(axis).Y), _blockMaterial),
+                Wall wall => GetModelVisual3D(GetBox(_wallSize, GetWallPosition(wall)), _wallMaterial),
+                HorizontalAxis axis => GetModelVisual3D(_gridMaterial, GetHorizontalPlane(CameraController.Camera.FarPlaneDistance * 2, GetAxisPosition(axis).Y).ToArray()),
                 _ => throw new NotImplementedException("Unknown visual element type")
             };
         }
@@ -537,12 +556,6 @@ namespace CSharpPICollision
                 {
                     case Block block:
                         entry.Value.Transform = GetBoxTransform(block);
-                        break;
-                    case Wall wall:
-                        entry.Value.Transform = GetWallTransform(wall);
-                        break;
-                    case HorizontalAxis axis:
-                    case CollisionsCount block:
                         break;
                 }
             }
@@ -569,7 +582,7 @@ namespace CSharpPICollision
         }
         public Point3D GetWallPosition(Wall wall)
         {
-            return new Point3D(wall.GetPosition() * _scalar, 0, 0);
+            return new Point3D(wall.GetPosition() * _scalar - _wallSize.X, 0, -_wallSize.Z / 2);
         }
         public Point3D GetAxisPosition(HorizontalAxis axis)
         {
@@ -580,8 +593,11 @@ namespace CSharpPICollision
         {
             _scene = new();
             _viewport3D = viewport3D;
-            _blockMaterial = new(new SolidColorBrush(Colors.DodgerBlue));
+            _blockMaterial = GetEmissiveMaterial(Brushes.DodgerBlue);
+            _wallMaterial = new DiffuseMaterial(Brushes.OrangeRed);
+            _gridMaterial = new DiffuseMaterial(Brushes.WhiteSmoke);
             _cameraController = cameraController;
+
         }
     }
 
@@ -675,7 +691,7 @@ namespace CSharpPICollision
 
             cameraController = new CameraController(camera, new Vector(20, 200));
 
-            cameraController.MinAngle = new Vector(0, 180);
+            cameraController.MinAngle = new Vector(0, 0);
             cameraController.MaxAngle = new Vector(90, 360);
 
             VisualEngine3D visualEngine = new VisualEngine3D(viewport, cameraController);
@@ -686,6 +702,8 @@ namespace CSharpPICollision
             {
                 visualEngine.Set(new VisualObject(obj));
             }
+
+            visualEngine.Set(new VisualObject(new HorizontalAxis(0)));
 
             timer.Interval = TimeSpan.FromMilliseconds(physicalEngine.Interval);
 
