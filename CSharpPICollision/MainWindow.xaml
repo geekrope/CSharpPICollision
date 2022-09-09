@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSharpPICollision"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" MouseMove="viewport_MouseMove" Background="White" MouseDown="Window_MouseDown">
+        Title="MainWindow" Height="450" Width="800" MouseMove="Window_MouseMove" Background="White" MouseDown="Window_MouseDown" MouseWheel="Window_MouseWheel">
     <Grid>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -16,7 +16,7 @@
         </Grid.Background>
         <Viewport3D Name="viewport">
             <Viewport3D.Camera>
-                <PerspectiveCamera Position="0 0 -20" LookDirection="0 0 1" x:Name="camera" FarPlaneDistance="100"/>
+                <PerspectiveCamera Position="0 0 -20" LookDirection="0 0 1" x:Name="camera" FarPlaneDistance="75"/>
             </Viewport3D.Camera>
             <Viewport3D.Children>
                 <ModelVisual3D>

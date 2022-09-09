@@ -422,8 +422,8 @@ namespace CSharpPICollision
 
     abstract class VisualEngine
     {
-        public abstract void Zoom(Point? relativePoint);
-        public abstract void Move(Point? value);
+        public abstract void Zoom();
+        public abstract void Move(Vector? value);
         public abstract void Refresh();
         public abstract void Set(VisualObject value);
     }
@@ -433,15 +433,20 @@ namespace CSharpPICollision
         private Dictionary<VisualObject, ModelVisual3D> _scene;
         private Viewport3D _viewport3D;
         private CameraController _cameraController;
+        private bool _scaled;
 
-        private readonly MaterialGroup _blockMaterial;
-        private readonly DiffuseMaterial _wallMaterial;
-        private readonly DiffuseMaterial _gridMaterial;
+        private readonly Material _blockMaterial;
+        private readonly Material _wallMaterial;
+        private readonly Material _gridMaterial;
         private readonly Size3D _wallSize = new Size3D(1, 4, 4);
 
         private double _scalar
         {
             get => 1;
+        }
+        private double _defaultMultiplier
+        {
+            get => 1.1;
         }
         private double _thickness
         {
@@ -459,7 +464,7 @@ namespace CSharpPICollision
 
         private ModelVisual3D GetModelVisual3D(MeshGeometry3D mesh, Material material)
         {
-            return new ModelVisual3D() { Content = new GeometryModel3D(mesh, material) { BackMaterial = material } };
+            return new ModelVisual3D() { Content = new GeometryModel3D(mesh, material) };
         }
         private ModelVisual3D GetModelVisual3D(Material material, params MeshGeometry3D[] meshes)
         {
@@ -539,14 +544,16 @@ namespace CSharpPICollision
             };
         }
 
-        public override void Zoom(Point? relativePoint)
+        public override void Zoom()
+        {
+            Zoom(_scaled ? 1 / _defaultMultiplier : _defaultMultiplier);
+
+            _scaled = !_scaled;
+        }        
+        public override void Move(Vector? value)
         {
             throw new NotImplementedException();
-        }
-        public override void Move(Point? value)
-        {
-            throw new NotImplementedException();
-        }
+        }        
 
         public override void Refresh()
         {
@@ -576,6 +583,11 @@ namespace CSharpPICollision
             _viewport3D.Children.Add(model);
         }
 
+        public void Zoom(double value)
+        {
+            _cameraController.Scale(value);
+        }
+
         public Point3D GetBlockPosition(Block block)
         {
             return new Point3D(block.GetPosition() * _scalar, 0, -block.Size * _scalar / 2);
@@ -595,15 +607,15 @@ namespace CSharpPICollision
             _viewport3D = viewport3D;
             _blockMaterial = GetEmissiveMaterial(Brushes.DodgerBlue);
             _wallMaterial = new DiffuseMaterial(Brushes.OrangeRed);
-            _gridMaterial = new DiffuseMaterial(Brushes.WhiteSmoke);
+            _gridMaterial = GetEmissiveMaterial(Brushes.White);
             _cameraController = cameraController;
-
         }
     }
 
     class CameraController
     {
         private Vector _rotation;
+        private double _scalar;
         private PerspectiveCamera _camera;
 
         public Vector Rotation
@@ -612,7 +624,7 @@ namespace CSharpPICollision
         }
         public Transform3D Transform
         {
-            get => GetRotationTransform(_rotation);
+            get => new Transform3DGroup() { Children = { GetRotationTransform(_rotation), GetScaleTransform(_scalar) } };
         }
         public PerspectiveCamera Camera
         {
@@ -633,7 +645,7 @@ namespace CSharpPICollision
             var angleX = movement.Y / size.Height * 180;
             var angleY = movement.X / size.Width * 180;
 
-            return new Vector(angleX, angleY);
+            return new Vector(angleX, -angleY);
         }
         private static Transform3D GetRotationTransform(Vector rotation)
         {
@@ -644,6 +656,10 @@ namespace CSharpPICollision
                 new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0,1,0), rotation.Y))
                 }
             };
+        }
+        private static Transform3D GetScaleTransform(double value)
+        {
+            return new ScaleTransform3D(value, value, value);
         }
 
         public void AddMovement(Vector movement, Size size)
@@ -660,15 +676,19 @@ namespace CSharpPICollision
                 _rotation.Y = newAngle.Y;
             }
         }
+        public void Scale(double value)
+        {
+            _scalar *= value;
+        }
 
         public CameraController(PerspectiveCamera camera)
         {
             _camera = camera;
             _rotation = new Vector();
+            _scalar = 1;
         }
-        public CameraController(PerspectiveCamera camera, Vector initialRotation)
+        public CameraController(PerspectiveCamera camera, Vector initialRotation) : this(camera)
         {
-            _camera = camera;
             _rotation = initialRotation;
         }
     }
@@ -720,7 +740,7 @@ namespace CSharpPICollision
             SetCameraProperties(cameraController, camera);
         }
 
-        private void viewport_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        private void Window_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
             var position = e.GetPosition(this);
 
@@ -740,6 +760,11 @@ namespace CSharpPICollision
         private void Window_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             lastMouseDown = e.GetPosition(this);
+        }
+
+        private void Window_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            cameraController.Scale(-0.1 * Math.Sign(e.Delta) + 1);
         }
     }
 }
