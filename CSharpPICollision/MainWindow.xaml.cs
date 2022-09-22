@@ -6,8 +6,8 @@ using System.Windows.Media.Media3D;
 using System.Windows.Controls;
 using System.Linq;
 using System.Windows.Threading;
-using System.Windows.Documents;
-using System.Reflection.Metadata;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace CSharpPICollision
 {
@@ -132,7 +132,7 @@ namespace CSharpPICollision
         }
     }
 
-    class Block : PhysicalObject
+    class Block : PhysicalObject, ICloneable
     {
         private MaterialPoint _properties;
         private double _size;
@@ -194,6 +194,11 @@ namespace CSharpPICollision
         public void SetVelocity(double value)
         {
             _properties.Velocity = value;
+        }
+
+        public object Clone()
+        {
+            return new Block(_size, _properties.Mass, _properties.Velocity, _properties.Position);
         }
 
         public Block(double size, double mass, double velocity, double position)
@@ -258,7 +263,7 @@ namespace CSharpPICollision
 
         private List<PhysicalObject> _objects;
         private EventHandler? _updateEvent;
-        private long _timeOffset;
+        private object _syncObj;
 
         public IReadOnlyList<PhysicalObject> Objects
         {
@@ -326,7 +331,10 @@ namespace CSharpPICollision
                 {
                     var block = (Block)obj;
 
-                    block.SetPosition(block.GetPosition(timeDelta));
+                    lock (_syncObj)
+                    {
+                        block.SetPosition(block.GetPosition(timeDelta));
+                    }
                 }
             }
         }
@@ -348,8 +356,11 @@ namespace CSharpPICollision
             {
                 if (obj is Block)
                 {
-                    ((Block)obj).SetPosition(response.Position);
-                    ((Block)obj).SetVelocity(response.Velocity);
+                    lock (_syncObj)
+                    {
+                        ((Block)obj).SetPosition(response.Position);
+                        ((Block)obj).SetVelocity(response.Velocity);
+                    }
                 }
             };
 
@@ -378,26 +389,19 @@ namespace CSharpPICollision
 
         public void Update()
         {
-            var timeDelta = (double)(Environment.TickCount64 - _timeOffset) / _timeUnit;
+            var timeDelta = (double)Interval / _timeUnit;
 
             var processedObjects = ProcessCollisions(timeDelta);
 
             UpdatePositions(processedObjects, timeDelta);
 
-            ResetTime();
-
             _updateEvent?.Invoke(this, EventArgs.Empty);
         }
-        public void ResetTime()
-        {
-            _timeOffset = Environment.TickCount64;
-        }
 
-        public PhysicalEngine(params PhysicalObject[] objects)
+        public PhysicalEngine(object syncObj, params PhysicalObject[] objects)
         {
             _objects = new(objects);
-
-            ResetTime();
+            _syncObj = syncObj;
         }
     }
 
@@ -430,6 +434,7 @@ namespace CSharpPICollision
 
     class VisualEngine3D : VisualEngine
     {
+        private object _syncObj;
         private Dictionary<VisualObject, ModelVisual3D> _scene;
         private Viewport3D _viewport3D;
         private CameraController _cameraController;
@@ -549,22 +554,31 @@ namespace CSharpPICollision
             Zoom(_scaled ? 1 / _defaultMultiplier : _defaultMultiplier);
 
             _scaled = !_scaled;
-        }        
+        }
         public override void Move(Vector? value)
         {
             throw new NotImplementedException();
-        }        
+        }
 
         public override void Refresh()
         {
-            foreach (var entry in _scene)
+            List<KeyValuePair<ModelVisual3D, Block>> _sceneCopy = new();
+            lock (_syncObj)
             {
-                switch (entry.Key.Value)
+                foreach (var entry in _scene)
                 {
-                    case Block block:
-                        entry.Value.Transform = GetBoxTransform(block);
-                        break;
+                    var block = entry.Key.Value as Block;
+
+                    if (block != null)
+                    {
+                        _sceneCopy.Add(new(entry.Value, block));
+                    }
                 }
+            }
+
+            foreach (var entry in _sceneCopy)
+            {
+                entry.Key.Transform = GetBoxTransform(entry.Value);
             }
         }
         public override void Set(VisualObject obj)
@@ -601,7 +615,7 @@ namespace CSharpPICollision
             return new Point3D(0, axis.Y * _scalar, 0);
         }
 
-        public VisualEngine3D(Viewport3D viewport3D, CameraController cameraController)
+        public VisualEngine3D(object syncObj, Viewport3D viewport3D, CameraController cameraController)
         {
             _scene = new();
             _viewport3D = viewport3D;
@@ -609,6 +623,7 @@ namespace CSharpPICollision
             _wallMaterial = new DiffuseMaterial(Brushes.OrangeRed);
             _gridMaterial = GetEmissiveMaterial(Brushes.White);
             _cameraController = cameraController;
+            _syncObj = syncObj;
         }
     }
 
@@ -714,8 +729,10 @@ namespace CSharpPICollision
             cameraController.MinAngle = new Vector(0, 0);
             cameraController.MaxAngle = new Vector(90, 360);
 
-            VisualEngine3D visualEngine = new VisualEngine3D(viewport, cameraController);
-            PhysicalEngine physicalEngine = new PhysicalEngine(firstBlock, new Block(1.5, 100.0 * 100 * 100 * 100 * 100, -1, 8), new Wall(0));
+            var sync = new object();
+
+            VisualEngine3D visualEngine = new VisualEngine3D(sync, viewport, cameraController);
+            PhysicalEngine physicalEngine = new PhysicalEngine(sync, firstBlock, new Block(1.5, 100.0 * 100 * 100 * 100 * 100, -2, 8), new Wall(0));
             DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Send);
 
             foreach (var obj in physicalEngine.Objects)
@@ -727,10 +744,21 @@ namespace CSharpPICollision
 
             timer.Interval = TimeSpan.FromMilliseconds(physicalEngine.Interval);
 
+            var task = Task.Run(() =>
+            {
+                for (; ; )
+                {
+                    physicalEngine.Update();
+
+                    Thread.Sleep(physicalEngine.Interval);
+                }
+            });
+
             timer.Tick += (object? sender, EventArgs args) =>
             {
-                physicalEngine.Update();
                 visualEngine.Refresh();
+
+                collisions.Text = $"COLLISIONS: {firstBlock.Collisions}";
 
                 SetCameraProperties(cameraController, camera);
             };
