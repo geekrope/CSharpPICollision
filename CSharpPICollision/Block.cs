@@ -99,5 +99,11 @@ namespace CSharpPICollision
             this._size = size;
             this._collisions = 0;
         }
+        public Block(double size, MaterialPoint properties)
+        {
+            this._properties = new MaterialPoint(properties.Mass, properties.Velocity, properties.Position);
+            this._size = size;
+            this._collisions = 0;
+        }
     }
 }
