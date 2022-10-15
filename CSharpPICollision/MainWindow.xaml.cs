@@ -18,7 +18,7 @@ namespace CSharpPICollision
         private DispatcherTimer dispatcherTimer;
         private CameraController cameraController;
 
-        private EventHandler UpdateView(VisualEngine3D visualEngine3D, Block firstBlock, TextBlock collisions)
+        private EventHandler UpdateView(IVisualEngine visualEngine3D, Block firstBlock, TextBlock collisions)
         {
             var closure = firstBlock;
 
@@ -58,7 +58,7 @@ namespace CSharpPICollision
             return cameraController;
         }
 
-        private VisualEngine3D InitializeVisualEngine3D(object sync, PhysicalEngine physicalEngine, CameraController cameraController, Viewport3D viewport)
+        private VisualEngine3D InitializeVisualEngine3D(object sync, IPhysicalEngine physicalEngine, CameraController cameraController, Viewport3D viewport)
         {
             VisualEngine3D visualEngine = new VisualEngine3D(sync, viewport, cameraController);
 
@@ -74,7 +74,7 @@ namespace CSharpPICollision
             return visualEngine;
         }
 
-        private DispatcherTimer InitializeTimer(PhysicalEngine physicalEngine, CancellationToken cancellationToken, EventHandler handler)
+        private DispatcherTimer InitializeTimer(IPhysicalEngine physicalEngine, CancellationToken cancellationToken, EventHandler handler)
         {
             DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Send);
 
@@ -100,7 +100,7 @@ namespace CSharpPICollision
             return (new Block(1, 1, 0, 2), new Block(1.5, mass, speed, 6));
         }
 
-        private (PhysicalEngine physicalEngine, VisualEngine3D visualEngine) InitializeEngines(CameraController cameraController, Viewport3D viewport, (Block, Block) blocks)
+        private (IPhysicalEngine physicalEngine, IVisualEngine visualEngine) InitializeEngines(CameraController cameraController, Viewport3D viewport, (Block, Block) blocks)
         {
             var sync = new object();
 
@@ -110,7 +110,7 @@ namespace CSharpPICollision
             return (physicalEngine, visualEngine);
         }
 
-        private void Start(PhysicalEngine engine, DispatcherTimer timer)
+        private void Start(IPhysicalEngine engine, DispatcherTimer timer)
         {
             engine.ResetTime();
             timer.Start();

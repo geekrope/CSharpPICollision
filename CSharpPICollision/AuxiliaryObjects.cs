@@ -25,8 +25,9 @@
     /// <param name="Y">Y coordinate of axis</param>
     record class HorizontalAxis(double Y);
 
-    delegate void CollisionsHandler();
-
+    /// <summary>
+    /// Pepresent tsrget of <see cref="CollisionResponse"/>>
+    /// </summary>
     enum CollisionTarget : int
     {
         First = 0,

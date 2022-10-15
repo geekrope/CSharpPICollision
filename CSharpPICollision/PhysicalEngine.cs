@@ -1,10 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace CSharpPICollision
 {
-    class PhysicalEngine
+    interface IPhysicalEngine
+    {
+        /// <summary>
+        /// Returns list of physical objects that are contained in PhysicalEngine 
+        /// </summary>
+        public IReadOnlyList<PhysicalObject> Objects
+        {
+            get;
+        }
+        /// <summary>
+        /// Delegate that is called after every update
+        /// </summary>
+        public event EventHandler OnUpdate;
+        /// <summary>
+        /// Default interval between two frames
+        /// </summary>
+        public int Interval
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Updates properties for all physical objects from the <seealso cref="Objects"/>
+        /// </summary>
+        public void Update();
+        /// <summary>
+        /// Sets the time offset to current tick count
+        /// </summary>
+        public void ResetTime();
+    }
+    class PhysicalEngine : IPhysicalEngine
     {
         private int _timeUnit
         {
@@ -20,24 +51,15 @@ namespace CSharpPICollision
         private double _timeOffset;
         private object _syncObj;
 
-        /// <summary>
-        /// Returns list of physical objects that are contained in PhysicalEngine 
-        /// </summary>
         public IReadOnlyList<PhysicalObject> Objects
         {
             get => _objects;
         }
-        /// <summary>
-        /// Delegate that is called after every update
-        /// </summary>
         public event EventHandler OnUpdate
         {
             add => _updateEvent += value;
             remove => _updateEvent -= value;
         }
-        /// <summary>
-        /// Default interval between two frames
-        /// </summary>
         public int Interval
         {
             get => 10;
@@ -196,10 +218,7 @@ namespace CSharpPICollision
 
             return processedObjects;
         }
-
-        /// <summary>
-        /// Updates properties for all physical objects from the <seealso cref="Objects"/>
-        /// </summary>
+       
         public void Update()
         {
             var timeDelta = (double)(Environment.TickCount - _timeOffset) / _timeUnit;
@@ -211,11 +230,7 @@ namespace CSharpPICollision
             ResetTime();
 
             _updateEvent?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// Sets the time offset to current tick count
-        /// </summary>
+        }        
         public void ResetTime()
         {
             _timeOffset = Environment.TickCount;
