@@ -121,6 +121,10 @@ namespace CSharpPICollision
                 Block block => GetModelVisual3D(GetBox(GetBoxSize(block)), _blockMaterial),
                 Wall wall => GetModelVisual3D(GetBox(_wallSize, GetWallPosition(wall)), _wallMaterial),
                 HorizontalAxis axis => GetModelVisual3D(_gridMaterial, GetHorizontalPlane(CameraController.Camera.FarPlaneDistance * 2, GetAxisPosition(axis).Y).ToArray()),
+                Light light => new ModelVisual3D()
+                {
+                    Content = light
+                },
                 _ => throw new NotImplementedException("Unknown visual element type")
             };
         }

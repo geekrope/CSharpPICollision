@@ -1,4 +1,6 @@
-﻿namespace CSharpPICollision
+﻿using System.Windows.Media.Media3D;
+
+namespace CSharpPICollision
 {
     class VisualObject
     {
@@ -7,6 +9,11 @@
         public object Value
         {
             get => _value;
+        }
+
+        public VisualObject(Light light)
+        {
+            _value = light;
         }
 
         public VisualObject(PhysicalObject block)

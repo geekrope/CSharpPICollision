@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSharpPICollision"
         mc:Ignorable="d"
-        Title="Properties edit dialog" ResizeMode="NoResize" WindowStyle="ToolWindow" Height="200" Width="300" Background="#f1f3f9" Closing="Window_Closing">
+        Title="Properties edit dialog" ResizeMode="NoResize" WindowStyle="ToolWindow" Height="200" Width="300" Background="#f1f3f9">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -13,13 +13,13 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Cursor="IBeam" Grid.Row="0" Margin= "0 10 0 0">
+        <Grid Grid.Row="0" Margin= "0 10 0 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" FontSize="24" FontFamily="Cascadia Code">mass</TextBlock>
-            <TextBox Width="150" HorizontalAlignment="Right" BorderThickness="0 0 0 1" BorderBrush="Gray" Name="mass" FontSize="24" Background="Transparent" Grid.Column="1" FontFamily="Cascadia Code" TextChanged="mass_TextChanged"></TextBox>
+            <TextBox Text="100" Width="150" HorizontalAlignment="Right" BorderThickness="0 0 0 1" BorderBrush="Gray" Name="mass" FontSize="24" Background="Transparent" Grid.Column="1" FontFamily="Cascadia Code" TextChanged="mass_TextChanged"></TextBox>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -27,7 +27,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" FontSize="24" FontFamily="Cascadia Code">speed</TextBlock>
-            <TextBox Width="150" HorizontalAlignment="Right" BorderThickness="0, 0, 0, 1" BorderBrush="Gray" Name="speed" FontSize="24" Background="Transparent" Grid.Column="1" FontFamily="Cascadia Code" TextChanged="speed_TextChanged"></TextBox>
+            <TextBox Text="-2" Width="150" HorizontalAlignment="Right" BorderThickness="0, 0, 0, 1" BorderBrush="Gray" Name="speed" FontSize="24" Background="Transparent" Grid.Column="1" FontFamily="Cascadia Code" TextChanged="speed_TextChanged"></TextBox>
         </Grid>
         <Grid Grid.Row="3" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>

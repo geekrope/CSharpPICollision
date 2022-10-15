@@ -5,60 +5,60 @@ using System.Windows.Threading;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
 using System.Windows.Media;
+using System.Linq;
+using System.Threading;
+using System.Windows.Controls;
 
 namespace CSharpPICollision
 {
     public partial class MainWindow : Window
     {
         private Point? lastMouseDown;
-        private (Block, Block) blocks;
-        private PhysicalEngine physicalEngine;
-        private VisualEngine3D visualEngine;
+        private CancellationTokenSource cancelPhysicalEngineTask;
         private DispatcherTimer dispatcherTimer;
         private CameraController cameraController;
-        private bool running
-        {
-            get => dispatcherTimer.IsEnabled;
-        }
 
-        private void Start()
-        {
-            physicalEngine.ResetTime();
-            dispatcherTimer.Start();
-        }
-        private void Stop()
-        {
-            dispatcherTimer.Stop();
-        }
-
-        private EventHandler UpdateView(Block firstBlock)
+        private EventHandler UpdateView(VisualEngine3D visualEngine3D, Block firstBlock, TextBlock collisions)
         {
             var closure = firstBlock;
 
             return (object? sender, EventArgs args) =>
             {
-                visualEngine.Refresh();
+                visualEngine3D.Refresh();
 
                 collisions.Text = $"COLLISIONS: {closure.Collisions}";
             };
         }
 
-        private void SetCameraProperties(CameraController controller, PerspectiveCamera camera)
+        private void SetCameraProperties(CameraController controller)
         {
-            camera.Transform = controller.Transform;
+            controller.Camera.Transform = controller.Transform;
         }
 
-        private CameraController InitializeCameraController()
+        private (double Mass, double Speed)? ShowPropertiesEditDialog()
+        {
+            var dialog = new PropertiesEditDialog();
+            var result = dialog.ShowDialog();
+
+            return (result.HasValue && result.Value) ? dialog.Properties : null;
+        }
+
+        private PerspectiveCamera InitializeCamera()
+        {
+            return new PerspectiveCamera() { Position = new Point3D(0, 0, -20), LookDirection = new Vector3D(0, 0, 1), FarPlaneDistance = 75 };
+        }
+
+        private CameraController InitializeCameraController(PerspectiveCamera camera)
         {
             var cameraController = new CameraController(camera, new Vector(20, 200));
 
-            cameraController.MinAngle = new Vector(0, 0);
-            cameraController.MaxAngle = new Vector(90, 360);
+            cameraController.MinAngle = new Vector(0, double.NegativeInfinity);
+            cameraController.MaxAngle = new Vector(90, double.PositiveInfinity);
 
             return cameraController;
         }
 
-        private VisualEngine3D InitializeVisualEngine3D(object sync, PhysicalEngine physicalEngine, CameraController cameraController)
+        private VisualEngine3D InitializeVisualEngine3D(object sync, PhysicalEngine physicalEngine, CameraController cameraController, Viewport3D viewport)
         {
             VisualEngine3D visualEngine = new VisualEngine3D(sync, viewport, cameraController);
 
@@ -68,11 +68,13 @@ namespace CSharpPICollision
             }
 
             visualEngine.Set(new VisualObject(new HorizontalAxis(0)));
+            visualEngine.Set(new VisualObject(new DirectionalLight(Colors.White, new Vector3D(-1, 0, 0))));
+            visualEngine.Set(new VisualObject(new DirectionalLight(Colors.White, new Vector3D(0, -1, 0))));
 
             return visualEngine;
         }
 
-        private DispatcherTimer InitializeTimer(VisualEngine visualEngine, PhysicalEngine physicalEngine, EventHandler handler)
+        private DispatcherTimer InitializeTimer(PhysicalEngine physicalEngine, CancellationToken cancellationToken, EventHandler handler)
         {
             DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Send);
 
@@ -80,14 +82,11 @@ namespace CSharpPICollision
 
             var task = Task.Run(async () =>
             {
-                for (; ; )
+                for (; !cancellationToken.IsCancellationRequested;)
                 {
-                    if (running)
-                    {
-                        physicalEngine.Update();
+                    physicalEngine.Update();
 
-                        await Task.Delay(physicalEngine.Interval);
-                    }
+                    await Task.Delay(physicalEngine.Interval);
                 }
             });
 
@@ -96,37 +95,57 @@ namespace CSharpPICollision
             return timer;
         }
 
-        private (PhysicalEngine physicalEngine, VisualEngine3D visualEngine) InitScene(CameraController cameraController, double mass, double speed)
+        private (Block, Block) InitializeBlocks(double mass, double speed)
         {
-            blocks.Item1 = new Block(1, 1, 0, 2);
-            blocks.Item2 = new Block(1.5, mass, speed, 6);
+            return (new Block(1, 1, 0, 2), new Block(1.5, mass, speed, 6));
+        }
 
+        private (PhysicalEngine physicalEngine, VisualEngine3D visualEngine) InitializeEngines(CameraController cameraController, Viewport3D viewport, (Block, Block) blocks)
+        {
             var sync = new object();
 
-            physicalEngine = new PhysicalEngine(sync, blocks.Item1, blocks.Item2, new Wall(0));
-            visualEngine = InitializeVisualEngine3D(sync, physicalEngine, cameraController);
+            var physicalEngine = new PhysicalEngine(sync, blocks.Item1, blocks.Item2, new Wall(0));
+            var visualEngine = InitializeVisualEngine3D(sync, physicalEngine, cameraController, viewport);
 
             return (physicalEngine, visualEngine);
         }
 
-        public MainWindow(double mass = 1e12, double speed = -2)
+        private void Start(PhysicalEngine engine, DispatcherTimer timer)
+        {
+            engine.ResetTime();
+            timer.Start();
+        }
+
+        private void Stop()
+        {
+            cancelPhysicalEngineTask.Cancel();
+            dispatcherTimer.Stop();
+        }
+
+        public MainWindow(double mass, double speed)
         {
             InitializeComponent();
 
-            cameraController = InitializeCameraController();
+            cancelPhysicalEngineTask = new CancellationTokenSource();
 
-            var scene = InitScene(cameraController, mass, speed);
+            var camera = InitializeCamera();
 
-            var updateView = UpdateView(blocks.Item1);
+            cameraController = InitializeCameraController(camera);
+            viewport.Camera = camera;
+            SetCameraProperties(cameraController);
 
-            physicalEngine = scene.physicalEngine;
-            visualEngine = scene.visualEngine;
+            var blocks = InitializeBlocks(mass, speed);
+            var engines = InitializeEngines(cameraController, viewport, blocks);
+            var updateView = UpdateView(engines.visualEngine, blocks.Item1, collisions);
 
-            dispatcherTimer = InitializeTimer(visualEngine, physicalEngine, updateView);
+            dispatcherTimer = InitializeTimer(engines.physicalEngine, cancelPhysicalEngineTask.Token, updateView);
 
-            SetCameraProperties(cameraController, camera);
+            Start(engines.physicalEngine, dispatcherTimer);
+        }
 
-            Start();
+        public MainWindow() : this(1e12, -2)
+        {
+
         }
 
         private void Window_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
@@ -140,7 +159,7 @@ namespace CSharpPICollision
 
                 cameraController.AddMovement(movement, size);
 
-                SetCameraProperties(cameraController, camera);
+                SetCameraProperties(cameraController);
             }
 
             lastMouseDown = position;
@@ -155,7 +174,21 @@ namespace CSharpPICollision
         {
             cameraController.Scale(-0.1 * Math.Sign(e.Delta) + 1);
 
-            SetCameraProperties(cameraController, camera);
+            SetCameraProperties(cameraController);
+        }
+
+        private void EditProperties_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var newProperties = ShowPropertiesEditDialog();
+
+            if (newProperties.HasValue)
+            {
+                var newWindow = new MainWindow(newProperties.Value.Mass, newProperties.Value.Speed);
+
+                newWindow.Show();
+
+                Close();
+            }
         }
     }
 }

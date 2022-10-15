@@ -1,4 +1,6 @@
-﻿namespace CSharpPICollision
+﻿using System;
+
+namespace CSharpPICollision
 {
     /// <summary>
     /// Physical object interface

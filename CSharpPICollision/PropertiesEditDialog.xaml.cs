@@ -1,19 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-
 namespace CSharpPICollision
 {
     public partial class PropertiesEditDialog : Window
@@ -44,20 +31,10 @@ namespace CSharpPICollision
 
             SetTextBoxStyle(input, value.HasValue);
         }
-        private void OpenSimulation()
+
+        public (double Mass, double Speed)? Properties
         {
-            MainWindow window;
-
-            if (_mass.HasValue && _speed.HasValue)
-            {
-                window = new MainWindow(_mass.Value, _speed.Value);
-            }
-            else
-            {
-                window = new MainWindow();
-            }
-
-            window.Show();
+            get => (_mass.HasValue && _speed.HasValue) ? (_mass.Value, _speed.Value) : null;
         }
         public PropertiesEditDialog()
         {
@@ -68,7 +45,7 @@ namespace CSharpPICollision
         {
             if (_mass.HasValue && _speed.HasValue)
             {
-
+                DialogResult = true;
 
                 Close();
             }
@@ -80,6 +57,8 @@ namespace CSharpPICollision
 
         private void cancel_Click(object sender, RoutedEventArgs e)
         {
+            DialogResult = false;
+
             Close();
         }
 
@@ -90,11 +69,6 @@ namespace CSharpPICollision
         private void speed_TextChanged(object sender, TextChangedEventArgs e)
         {
             ReadValue(speed, out _speed);
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            OpenSimulation();
         }
     }
 }
