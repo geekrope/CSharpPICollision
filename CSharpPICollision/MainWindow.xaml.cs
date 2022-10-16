@@ -3,9 +3,7 @@ using System.Windows;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 using System.Threading.Tasks;
-using System.Windows.Shapes;
 using System.Windows.Media;
-using System.Linq;
 using System.Threading;
 using System.Windows.Controls;
 
@@ -143,7 +141,7 @@ namespace CSharpPICollision
             Start(engines.physicalEngine, dispatcherTimer);
         }
 
-        public MainWindow() : this(1e12, -2)
+        public MainWindow() : this(1e6, -2)
         {
 
         }
