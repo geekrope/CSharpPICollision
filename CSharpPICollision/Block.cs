@@ -8,7 +8,7 @@ namespace CSharpPICollision
     class Block : PhysicalObject, ICloneable
     {
         private MaterialPoint _properties;
-        private double _size;
+        private decimal _size;
         private int _collisions;
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace CSharpPICollision
         /// <summary>
         /// Returns block size
         /// </summary>
-        public double Size
+        public decimal Size
         {
             get => this._size;
         }
@@ -33,7 +33,7 @@ namespace CSharpPICollision
             get => this._collisions;
         }
 
-        public override double GetPosition(double? timeDelta = null)
+        public override decimal GetPosition(decimal? timeDelta = null)
         {
             if (timeDelta.HasValue)
             {
@@ -44,11 +44,11 @@ namespace CSharpPICollision
                 return _properties.Position;
             }
         }
-        public override double GetVelocity()
+        public override decimal GetVelocity()
         {
             return _properties.Velocity;
         }
-        public override double Distance(PhysicalObject obj, double? timeDelta = null)
+        public override decimal Distance(PhysicalObject obj, decimal? timeDelta = null)
         {
             return obj switch
             {
@@ -57,7 +57,7 @@ namespace CSharpPICollision
                 _ => throw new ArgumentException("Cannot define obj type")
             };
         }
-        public override double ProcessCollision(PhysicalObject obj)
+        public override decimal ProcessCollision(PhysicalObject obj)
         {
             this._collisions++;
 
@@ -73,7 +73,7 @@ namespace CSharpPICollision
         /// Sets block position
         /// </summary>
         /// <param name="value">Position on axis</param>
-        public void SetPosition(double value)
+        public void SetPosition(decimal value)
         {
             _properties.Position = value;
         }
@@ -81,7 +81,7 @@ namespace CSharpPICollision
         /// Sets block velocity
         /// </summary>
         /// <param name="value">Velocity projection on axis</param>
-        public void SetVelocity(double value)
+        public void SetVelocity(decimal value)
         {
             _properties.Velocity = value;
         }
@@ -93,13 +93,13 @@ namespace CSharpPICollision
         /// <summary>
         /// Initializes new instance of Block
         /// </summary>
-        public Block(double size, double mass, double velocity, double position)
+        public Block(decimal size, decimal mass, decimal velocity, decimal position)
         {
             this._properties = new MaterialPoint(mass, velocity, position);
             this._size = size;
             this._collisions = 0;
         }
-        public Block(double size, MaterialPoint properties)
+        public Block(decimal size, MaterialPoint properties)
         {
             this._properties = new MaterialPoint(properties.Mass, properties.Velocity, properties.Position);
             this._size = size;

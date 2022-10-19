@@ -41,14 +41,14 @@ namespace CSharpPICollision
         {
             get => 1000;
         }
-        private double _epsilon
+        private decimal _epsilon
         {
-            get => 1e-15;
+            get => 1e-15m;
         }
 
         private List<PhysicalObject> _objects;
         private EventHandler? _updateEvent;
-        private double _timeOffset;
+        private decimal _timeOffset;
         private object _syncObj;
 
         public IReadOnlyList<PhysicalObject> Objects
@@ -84,10 +84,10 @@ namespace CSharpPICollision
         /// </returns>
         private bool IsMovingTowards(PhysicalObject obj1, PhysicalObject obj2)
         {
-            double distance = obj2.GetPosition() - obj1.GetPosition();
-            double relativeVelocity = obj1.GetVelocity() - obj2.GetVelocity();
+            decimal distance = obj2.GetPosition() - obj1.GetPosition();
+            decimal relativeVelocity = obj1.GetVelocity() - obj2.GetVelocity();
             int movementDiretion = Math.Abs(distance) > _epsilon ? Math.Sign(distance) : 0;
-            double velocityDiretion = Math.Abs(relativeVelocity) > _epsilon ? Math.Sign(relativeVelocity) : 0;
+            decimal velocityDiretion = Math.Abs(relativeVelocity) > _epsilon ? Math.Sign(relativeVelocity) : 0;
 
             return movementDiretion == velocityDiretion;
         }
@@ -97,10 +97,10 @@ namespace CSharpPICollision
         /// <param name="obj1">First object to which method is applied</param>
         /// <param name="obj2">Second object to which method is applied</param>
         /// <returns>Time to collision</returns>
-        private double ComputeCollisionTime(PhysicalObject obj1, PhysicalObject obj2)
+        private decimal ComputeCollisionTime(PhysicalObject obj1, PhysicalObject obj2)
         {
-            double resultVelocity = Math.Abs(obj1.GetVelocity() - obj2.GetVelocity());
-            double time = obj1.Distance(obj2) / resultVelocity;
+            decimal resultVelocity = Math.Abs(obj1.GetVelocity() - obj2.GetVelocity());
+            decimal time = obj1.Distance(obj2) / resultVelocity;
 
             return time;
         }
@@ -110,7 +110,7 @@ namespace CSharpPICollision
         /// <param name="obj1">First object to which method is applied</param>
         /// <param name="obj2">Second object to which method is applied</param>
         /// <returns>Nearest <seealso cref="Collision"/> or null if no objects collide within time delta</returns>
-        private Collision? GetNearestCollision(IReadOnlyList<PhysicalObject> objects, double timeDelta)
+        private Collision? GetNearestCollision(IReadOnlyList<PhysicalObject> objects, decimal timeDelta)
         {
             Collision? collision = null;
 
@@ -143,7 +143,7 @@ namespace CSharpPICollision
         /// </summary>
         /// <param name="processedObjects">List of processed objects</param>
         /// <param name="timeDelta">Time delta</param>
-        private void UpdatePositions(IReadOnlyList<PhysicalObject> processedObjects, double timeDelta)
+        private void UpdatePositions(IReadOnlyList<PhysicalObject> processedObjects, decimal timeDelta)
         {
             foreach (var obj in _objects)
             {
@@ -179,7 +179,7 @@ namespace CSharpPICollision
         /// </summary>
         /// <param name="timeDelta">Time delta between two frames</param>
         /// <returns>List of processed objects</returns>
-        private List<PhysicalObject> ProcessCollisions(double timeDelta)
+        private List<PhysicalObject> ProcessCollisions(decimal timeDelta)
         {
             List<PhysicalObject> processedObjects = new();
             bool computed = false;
@@ -221,7 +221,7 @@ namespace CSharpPICollision
        
         public void Update()
         {
-            var timeDelta = (double)(Environment.TickCount - _timeOffset) / _timeUnit;
+            var timeDelta = (decimal)(Environment.TickCount - _timeOffset) / _timeUnit;
 
             var processedObjects = ProcessCollisions(timeDelta);
 

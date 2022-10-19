@@ -5,14 +5,14 @@ namespace CSharpPICollision
 {
     public partial class PropertiesEditDialog : Window
     {
-        private double? _mass;
-        private double? _speed;
+        private decimal? _mass;
+        private decimal? _speed;
 
-        private double? ValidateInput(TextBox input)
+        private decimal? ValidateInput(TextBox input)
         {
-            double result = 0;
+            decimal result = 0;
 
-            if (double.TryParse(input.Text, out result))
+            if (decimal.TryParse(input.Text, out result))
             {
                 return result;
             }
@@ -25,14 +25,14 @@ namespace CSharpPICollision
         {
             input.BorderBrush = valid ? Brushes.Gray : Brushes.OrangeRed;
         }
-        private void ReadValue(TextBox input, out double? value)
+        private void ReadValue(TextBox input, out decimal? value)
         {
             value = ValidateInput(input);
 
             SetTextBoxStyle(input, value.HasValue);
         }
 
-        public (double Mass, double Speed)? Properties
+        public (decimal Mass, decimal Speed)? Properties
         {
             get => (_mass.HasValue && _speed.HasValue) ? (_mass.Value, _speed.Value) : null;
         }

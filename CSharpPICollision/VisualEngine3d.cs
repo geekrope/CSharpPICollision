@@ -51,30 +51,30 @@ namespace CSharpPICollision
         /// <summary>
         /// Represents scalar of object model units
         /// </summary>
-        private double _scalar
+        private decimal _scalar
         {
             get => 1;
         }
         /// <summary>
         /// Represents multiplier of scale transfrom
         /// </summary>
-        private double _defaultMultiplier
+        private decimal _defaultMultiplier
         {
-            get => 1.1;
+            get => 1.1m;
         }
         /// <summary>
         /// Represents thickness of grid
         /// </summary>
-        private double _thickness
+        private decimal _thickness
         {
-            get => 0.02;
+            get => 0.02m;
         }
         /// <summary>
         /// Represents size of grid cells
         /// </summary>
-        private double _gridSize
+        private decimal _gridSize
         {
-            get => 0.5;
+            get => 0.5m;
         }
 
         /// <summary>
@@ -148,12 +148,12 @@ namespace CSharpPICollision
         /// <param name="size">Length and width of grid</param>
         /// <param name="yOffset">Y coordinate of grid</param>
         /// <returns></returns>
-        private IEnumerable<MeshGeometry3D> GetHorizontalPlane(double size, double yOffset)
+        private IEnumerable<MeshGeometry3D> GetHorizontalPlane(decimal size, decimal yOffset)
         {
-            for (double offset = -size / 2; offset < size / 2; offset += _gridSize)
+            for (decimal offset = -size / 2; offset < size / 2; offset += _gridSize)
             {
-                yield return GetBox(new Size3D(_thickness, _thickness, size), new Point3D(offset - _thickness / 2, -_thickness + yOffset, -size / 2));
-                yield return GetBox(new Size3D(size, _thickness, _thickness), new Point3D(-size / 2, -_thickness + yOffset, offset - _thickness / 2));
+                yield return GetBox(new Size3D((double)_thickness, (double)_thickness, (double)size), new Point3D((double)(offset - _thickness / 2), (double)-_thickness + (double)yOffset, (double)-size / 2));
+                yield return GetBox(new Size3D((double)size, (double)_thickness, (double)_thickness), new Point3D((double)(-size / 2), (double)(-_thickness + yOffset), (double)(offset - _thickness / 2)));
             }
         }
 
@@ -176,7 +176,7 @@ namespace CSharpPICollision
         /// <returns>Size of the block with scalar applied</returns>
         private Size3D GetBoxSize(Block block)
         {
-            return new Size3D(block.Size * _scalar, block.Size * _scalar, block.Size * _scalar);
+            return new Size3D((double)(block.Size * _scalar), (double)(block.Size * _scalar), (double)(block.Size * _scalar));
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace CSharpPICollision
             {
                 Block block => GetModelVisual3D(GetBox(GetBoxSize(block)), _blockMaterial),
                 Wall wall => GetModelVisual3D(GetBox(_wallSize, GetWallPosition(wall)), _wallMaterial),
-                HorizontalAxis axis => GetModelVisual3D(_gridMaterial, GetHorizontalPlane(CameraController.Camera.FarPlaneDistance * 2, GetAxisPosition(axis).Y).ToArray()),
+                HorizontalAxis axis => GetModelVisual3D(_gridMaterial, GetHorizontalPlane((decimal)(CameraController.Camera.FarPlaneDistance * 2), (decimal)GetAxisPosition(axis).Y).ToArray()),
                 Light light => new ModelVisual3D()
                 {
                     Content = light
@@ -273,7 +273,7 @@ namespace CSharpPICollision
         /// Overload of Zoom() with sertain multiplier
         /// </summary>
         /// <param name="value"></param>
-        public void Zoom(double value)
+        public void Zoom(decimal value)
         {
             _cameraController.Scale(value);
         }
@@ -285,7 +285,7 @@ namespace CSharpPICollision
         /// <returns>Block position in visual units</returns>
         public Point3D GetBlockPosition(Block block)
         {
-            return new Point3D(block.GetPosition() * _scalar, 0, -block.Size * _scalar / 2);
+            return new Point3D((double)(block.GetPosition() * _scalar), 0, (double)(-block.Size * _scalar / 2));
         }
         /// <summary>
         /// Returns wall position in visual units
@@ -294,7 +294,7 @@ namespace CSharpPICollision
         /// <returns>Wall position in visual units</returns>
         public Point3D GetWallPosition(Wall wall)
         {
-            return new Point3D(wall.GetPosition() * _scalar - _wallSize.X, 0, -_wallSize.Z / 2);
+            return new Point3D((double)(wall.GetPosition() * _scalar - (decimal)_wallSize.X), 0, -_wallSize.Z / 2);
         }
         /// <summary>
         /// Returns axis position in visual units
@@ -303,7 +303,7 @@ namespace CSharpPICollision
         /// <returns>Axis position in visual units</returns>
         public Point3D GetAxisPosition(HorizontalAxis axis)
         {
-            return new Point3D(0, axis.Y * _scalar, 0);
+            return new Point3D(0, (double)(axis.Y * _scalar), 0);
         }
         /// <summary>
         /// Initilizes new instance of VisualEngine3D

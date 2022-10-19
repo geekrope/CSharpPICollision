@@ -15,7 +15,7 @@ namespace CSharpPICollision
         /// <summary>
         /// Represents zoom scalar
         /// </summary>
-        private double _scalar;
+        private decimal _scalar;
         /// <summary>
         /// Represents controlled camera object
         /// </summary>
@@ -91,9 +91,9 @@ namespace CSharpPICollision
         /// </summary>
         /// <param name="value">Zoom multiplier</param>
         /// <returns>Scale transform</returns>
-        private static Transform3D GetScaleTransform(double value)
+        private static Transform3D GetScaleTransform(decimal value)
         {
-            return new ScaleTransform3D(value, value, value);
+            return new ScaleTransform3D((double)value, (double)value, (double)value);
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace CSharpPICollision
         /// Scales viewport by scalar 
         /// </summary>
         /// <param name="value">Scale multiplier</param>
-        public void Scale(double value)
+        public void Scale(decimal value)
         {
             _scalar *= value;
         }
