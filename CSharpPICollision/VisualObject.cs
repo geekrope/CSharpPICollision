@@ -5,12 +5,12 @@ namespace CSharpPICollision
     class VisualObject
     {
         /// <summary>
-        /// Represents object that is contained in current element
+        /// Represents an object that is contained in current element
         /// </summary>
         private object _value;
 
         /// <summary>
-        /// Represents object that is contained in current element
+        /// Represents an object that is contained in current element
         /// </summary>
         public object Value
         {

@@ -15,7 +15,7 @@ namespace CSharpPICollision
             return new Segment(position, position + size);
         }
         /// <summary>
-        /// Returns segment legnth
+        /// Returns segment length
         /// </summary>
         /// <param name="segment">Segment to which method is applied</param>
         /// <returns>Length</returns>

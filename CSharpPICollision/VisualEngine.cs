@@ -9,7 +9,7 @@ namespace CSharpPICollision
         /// </summary>
         public abstract void Zoom();
         /// <summary>
-        /// Adjust movment of scene
+        /// Adjust movement of scene
         /// </summary>
         public abstract void Move(Vector? value);
         /// <summary>

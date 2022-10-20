@@ -56,7 +56,7 @@ namespace CSharpPICollision
             get => 1;
         }
         /// <summary>
-        /// Represents multiplier of scale transfrom
+        /// Represents multiplier of scale transform
         /// </summary>
         private double _defaultMultiplier
         {
@@ -86,21 +86,21 @@ namespace CSharpPICollision
         }
 
         /// <summary>
-        /// Returns ModelVisual3D builded from mesh and material
+        /// Returns ModelVisual3D built from mesh and material
         /// </summary>
         /// <param name="mesh">Mesh of ModelVisual3D</param>
         /// <param name="material">Material of ModelVisual3D</param>
-        /// <returns>ModelVisual3D builded from mesh and material</returns>
+        /// <returns>ModelVisual3D built from mesh and material</returns>
         private ModelVisual3D GetModelVisual3D(MeshGeometry3D mesh, Material material)
         {
             return new ModelVisual3D() { Content = new GeometryModel3D(mesh, material) };
         }
         /// <summary>
-        /// Returns ModelVisual3D builded from several meshes and material
+        /// Returns ModelVisual3D built from several meshes and material
         /// </summary>
         /// <param name="meshes">Meshes that should be combined</param>
         /// <param name="material">Material of ModelVisual3D</param>
-        /// <returns>ModelVisual3D builded from several meshes and material</returns>
+        /// <returns>ModelVisual3D built from several meshes and material</returns>
         private ModelVisual3D GetModelVisual3D(Material material, params MeshGeometry3D[] meshes)
         {
             var collection = new Model3DGroup();
@@ -200,7 +200,7 @@ namespace CSharpPICollision
         /// </summary>
         /// <param name="obj">Object that should be converted</param>
         /// <returns>Object of visual model with properties from object model</returns>
-        /// <exception cref="NotImplementedException">Throws exception when object is not listed in known implementaions</exception>
+        /// <exception cref="NotImplementedException">Throws exception when object is not listed in known implementations</exception>
         private ModelVisual3D GetModel3D(VisualObject obj)
         {
             return obj.Value switch
@@ -270,7 +270,7 @@ namespace CSharpPICollision
         }
 
         /// <summary>
-        /// Overload of Zoom() with sertain multiplier
+        /// Overload of Zoom() with certain multiplier
         /// </summary>
         /// <param name="value"></param>
         public void Zoom(double value)

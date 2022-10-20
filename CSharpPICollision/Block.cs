@@ -26,7 +26,7 @@ namespace CSharpPICollision
             get => this._size;
         }
         /// <summary>
-        /// Returns collisions the number with any other object
+        /// Returns the number of collisions with any other object
         /// </summary>
         public int Collisions
         {

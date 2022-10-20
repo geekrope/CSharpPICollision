@@ -19,7 +19,7 @@ namespace CSharpPICollision
         /// <returns>Object position on axis</returns>
         public abstract double GetPosition(double? timeDelta = null);
         /// <summary>
-        /// Returns distance between current physical object and another object in specific moment of time
+        /// Returns distance between current physical object and another object in a specific moment of time
         /// </summary>
         /// <param name="obj">Object which is related to distance</param>
         /// <param name="timeDelta">Moment of time</param>
