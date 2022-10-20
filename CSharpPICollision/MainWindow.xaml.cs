@@ -16,15 +16,18 @@ namespace CSharpPICollision
         private DispatcherTimer dispatcherTimer;
         private CameraController cameraController;
 
-        private EventHandler UpdateView(IVisualEngine visualEngine3D, Block firstBlock, TextBlock collisions)
+        private int Precision
         {
-            var closure = firstBlock;
+            get => 10000;
+        }
 
+        private EventHandler UpdateView(IVisualEngine visualEngine3D, Block firstBlock, TextBlock collisions, int precision)
+        {
             return (object? sender, EventArgs args) =>
             {
                 visualEngine3D.Refresh();
 
-                collisions.Text = $"COLLISIONS: {closure.Collisions}";
+                collisions.Text = $"COLLISIONS: {firstBlock.Collisions}\nM = {firstBlock.Properties.Mass} \nV = {Math.Round(firstBlock.Properties.Velocity * precision) / (double)precision}";
             };
         }
 
@@ -134,7 +137,7 @@ namespace CSharpPICollision
 
             var blocks = InitializeBlocks(mass, speed);
             var engines = InitializeEngines(cameraController, viewport, blocks);
-            var updateView = UpdateView(engines.visualEngine, blocks.Item1, collisions);
+            var updateView = UpdateView(engines.visualEngine, blocks.Item1, collisions, Precision);
 
             dispatcherTimer = InitializeTimer(engines.physicalEngine, cancelPhysicalEngineTask.Token, updateView);
 
