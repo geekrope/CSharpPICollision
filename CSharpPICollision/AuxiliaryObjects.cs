@@ -29,10 +29,10 @@
     /// Invoked when sender collides with another object
     /// </summary>
     /// <param name="sender">Collided object</param>
-    delegate void CollideHandler(PhysicalObject sender);
+    delegate void CollideHandler(Block sender);
 
     /// <summary>
-    /// Pepresent tsrget of <see cref="CollisionResponse"/>>
+    /// Pepresent target of <see cref="CollisionResponse"/>>
     /// </summary>
     enum CollisionTarget : int
     {
