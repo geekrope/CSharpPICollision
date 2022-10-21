@@ -14,11 +14,17 @@ namespace CSharpPICollision
         private Point? lastMouseDown;
         private CancellationTokenSource cancelPhysicalEngineTask;
         private DispatcherTimer dispatcherTimer;
+        private IPhysicalEngine physicalEngine;
         private CameraController cameraController;
 
-        private int Precision
+        private int precision
         {
             get => 10000;
+        }
+
+        private bool running
+        {
+            get => dispatcherTimer.IsEnabled;
         }
 
         private EventHandler UpdateView(IVisualEngine visualEngine3D, Block firstBlock, TextBlock collisions, int precision)
@@ -85,9 +91,12 @@ namespace CSharpPICollision
             {
                 for (; !cancellationToken.IsCancellationRequested;)
                 {
-                    physicalEngine.Update();
+                    if(running)
+                    {
+                        physicalEngine.Update();
 
-                    await Task.Delay(physicalEngine.Interval);
+                        await Task.Delay(physicalEngine.Interval);
+                    }                  
                 }
             });
 
@@ -137,11 +146,11 @@ namespace CSharpPICollision
 
             var blocks = InitializeBlocks(mass, speed);
             var engines = InitializeEngines(cameraController, viewport, blocks);
-            var updateView = UpdateView(engines.visualEngine, blocks.Item1, collisions, Precision);
+            var updateView = UpdateView(engines.visualEngine, blocks.Item1, collisions, precision);
 
             dispatcherTimer = InitializeTimer(engines.physicalEngine, cancelPhysicalEngineTask.Token, updateView);
 
-            Start(engines.physicalEngine, dispatcherTimer);
+            physicalEngine = engines.physicalEngine;            
         }
 
         public MainWindow() : this(1e6, -2)
@@ -169,6 +178,13 @@ namespace CSharpPICollision
         private void Window_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             lastMouseDown = e.GetPosition(this);
+
+            if (!running)
+            {
+                Start(physicalEngine, dispatcherTimer);
+
+                startMessage.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void Window_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)

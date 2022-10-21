@@ -47,5 +47,8 @@
                 </Viewbox>
             </Grid>
         </Border>
-    </Grid>
+        <Label Name="startMessage" HorizontalAlignment="Center" FontSize="36" FontFamily="Cascadia Code" Foreground="White" VerticalAlignment="Center" Grid.RowSpan="3" Grid.ColumnSpan="2">
+            Click to start
+        </Label>
+    </Grid>    
 </Window>
