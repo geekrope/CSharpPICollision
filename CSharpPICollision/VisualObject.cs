@@ -2,7 +2,7 @@
 
 namespace CSharpPICollision
 {
-    class VisualObject
+    public class VisualObject
     {
         /// <summary>
         /// Represents an object that is contained in current element

@@ -2,7 +2,7 @@
 
 namespace CSharpPICollision
 {
-    class Wall : PhysicalObject
+    public class Wall : PhysicalObject
     {
         private double _position;
 

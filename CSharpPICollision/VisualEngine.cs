@@ -2,7 +2,7 @@
 
 namespace CSharpPICollision
 {
-    interface IVisualEngine
+    public interface IVisualEngine
     {
         /// <summary>
         /// Adjust zoom of scene

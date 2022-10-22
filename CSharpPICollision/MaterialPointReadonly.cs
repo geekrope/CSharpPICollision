@@ -3,7 +3,7 @@
     /// <summary>
     /// MaterialPoint interface
     /// </summary>
-    interface MaterialPointReadonly
+    public interface MaterialPointReadonly
     {
         /// <summary>
         /// Returns impulse of material point

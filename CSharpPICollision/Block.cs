@@ -5,7 +5,7 @@ namespace CSharpPICollision
     /// <summary>
     /// Implementation of <see cref="PhysicalObject"/>
     /// </summary>
-    class Block : PhysicalObject, ICloneable
+    public class Block : PhysicalObject, ICloneable
     {
         private MaterialPoint _properties;
         private CollideHandler? _onCollide;

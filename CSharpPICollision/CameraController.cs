@@ -6,7 +6,7 @@ namespace CSharpPICollision
     /// <summary>
     /// Controls PerspectiveCamera rotation and zoom
     /// </summary>
-    class CameraController
+    public class CameraController
     {
         /// <summary>
         /// Represents rotation vector

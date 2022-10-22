@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace CSharpPICollision
 {
-    interface IPhysicalEngine
+    public interface IPhysicalEngine
     {
         /// <summary>
         /// Returns list of physical objects that are contained in PhysicalEngine 

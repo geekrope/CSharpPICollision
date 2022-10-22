@@ -23,13 +23,13 @@
     /// Represents horizontal plane properties
     /// </summary>
     /// <param name="Y">Y coordinate of axis</param>
-    record class HorizontalAxis(double Y);
+    public record class HorizontalAxis(double Y);
 
     /// <summary>
     /// Invoked when sender collides with another object
     /// </summary>
     /// <param name="sender">Collided object</param>
-    delegate void CollideHandler(Block sender);
+    public delegate void CollideHandler(Block sender);
 
     /// <summary>
     /// Pepresent target of <see cref="CollisionResponse"/>>

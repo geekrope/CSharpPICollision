@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace CSharpPICollision
 {
-    class VisualEngine3D : IVisualEngine
+    public class VisualEngine3D : IVisualEngine
     {
         /// <summary>
         /// Represents object that syncs threads of calculation and visualization

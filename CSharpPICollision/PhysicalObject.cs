@@ -5,7 +5,7 @@ namespace CSharpPICollision
     /// <summary>
     /// Physical object interface
     /// </summary>
-    abstract class PhysicalObject
+    public abstract class PhysicalObject
     {
         /// <summary>
         /// Returns current velocity of physical object

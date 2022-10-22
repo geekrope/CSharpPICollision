@@ -3,7 +3,7 @@
     /// <summary>
     /// Mutable implementation of <seealso cref="MaterialPointReadonly"/>
     /// </summary>
-    class MaterialPoint : MaterialPointReadonly
+    public class MaterialPoint : MaterialPointReadonly
     {
         public double Impulse
         {
