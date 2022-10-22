@@ -8,7 +8,6 @@ namespace CSharpPICollision
     public class Block : PhysicalObject, ICloneable
     {
         private MaterialPoint _properties;
-        private CollideHandler? _onCollide;
         private double _size;
         private int _collisions;
 
@@ -32,21 +31,6 @@ namespace CSharpPICollision
         public int Collisions
         {
             get => this._collisions;
-        }
-
-        /// <summary>
-        /// Represents collision event
-        /// </summary>
-        public event CollideHandler OnCollide
-        {
-            add
-            {
-                _onCollide += value;
-            }
-            remove
-            {
-                _onCollide -= value;
-            }
         }
 
         public override double GetPosition(double? timeDelta = null)
@@ -76,8 +60,6 @@ namespace CSharpPICollision
         public override double ProcessCollision(PhysicalObject obj)
         {
             this._collisions++;
-
-            _onCollide?.Invoke(this);
 
             return obj switch
             {

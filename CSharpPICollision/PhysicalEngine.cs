@@ -48,6 +48,7 @@ namespace CSharpPICollision
 
         private List<PhysicalObject> _objects;
         private EventHandler? _updateEvent;
+        private EventHandler? _onCollisionProcessed;
         private double _timeOffset;
         private object _syncObj;
 
@@ -59,6 +60,14 @@ namespace CSharpPICollision
         {
             add => _updateEvent += value;
             remove => _updateEvent -= value;
+        }
+        /// <summary>
+        /// Invoked after every processing of collision
+        /// </summary>
+        public event EventHandler OnCollisionProcessed
+        {
+            add => _onCollisionProcessed += value;
+            remove => _onCollisionProcessed -= value;
         }
         public int Interval
         {
@@ -208,6 +217,8 @@ namespace CSharpPICollision
                     Respond(nearestCollision.Value.Object1, properties1);
                     Respond(nearestCollision.Value.Object2, properties2);
 
+                    _onCollisionProcessed?.Invoke(this, EventArgs.Empty);
+
                     processedObjects.AddRange(new[] { nearestCollision.Value.Object1, nearestCollision.Value.Object2 });
                 }
                 else
@@ -218,7 +229,7 @@ namespace CSharpPICollision
 
             return processedObjects;
         }
-       
+
         public void Update()
         {
             var timeDelta = (double)(Environment.TickCount - _timeOffset) / _timeUnit;
@@ -230,7 +241,7 @@ namespace CSharpPICollision
             ResetTime();
 
             _updateEvent?.Invoke(this, EventArgs.Empty);
-        }        
+        }
         public void ResetTime()
         {
             _timeOffset = Environment.TickCount;

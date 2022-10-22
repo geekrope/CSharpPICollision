@@ -5,6 +5,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using CSharpPICollision;
+using System.Windows.Input;
+using System.Linq.Expressions;
 
 namespace Graph
 {
@@ -47,20 +49,56 @@ namespace Graph
             var physicalEngine = new PhysicalEngine(sync, blocks.Item1, blocks.Item2, new Wall(0));
             var visualEngine = new GraphEngine(canvas, (blocks.Item2, blocks.Item1), sync);
 
+            physicalEngine.OnCollisionProcessed += (object? sender, EventArgs args) => { visualEngine.Refresh(); };
+
             return (physicalEngine, visualEngine);
+        }
+        private (double Mass, double Velocity) GetPropeties()
+        {
+            var propetiesEditDialog = new PropertiesEditDialog();
+            var result = propetiesEditDialog.ShowDialog();
+
+            if (result.HasValue && result.Value && propetiesEditDialog.Properties.HasValue)
+            {
+                return propetiesEditDialog.Properties.Value;
+            }
+            else
+            {
+                return (100, -2);
+            }
         }
 
         public MainWindow()
         {
             InitializeComponent();
 
-            var blocks = InitializeBlocks(100, -2);
+            var properties = GetPropeties();
+            var blocks = InitializeBlocks(properties.Mass, properties.Velocity);
             var engines = InitializeEngines(cnvs, blocks);
 
             cancelPhysicalEngineTask = new CancellationTokenSource();
-            dispatcherTimer = InitializeTimer(engines.physicalEngine, cancelPhysicalEngineTask.Token, UpdateView(engines.physicalEngine,blocks.Item1));
+            dispatcherTimer = InitializeTimer(engines.physicalEngine, cancelPhysicalEngineTask.Token, UpdateView(engines.physicalEngine, blocks.Item1));
 
             dispatcherTimer.Start();
+        }
+
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                switch (e.Key)
+                {
+                    case Key.P:
+                        var printDialog = new PrintDialog();
+
+                        if (printDialog.ShowDialog() == true)
+                        {
+                            printDialog.PrintVisual(cnvs, "Printing velocities graph");
+                        }
+
+                        break;
+                }
+            }
         }
     }
 }

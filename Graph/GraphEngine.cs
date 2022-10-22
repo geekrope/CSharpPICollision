@@ -27,6 +27,14 @@ namespace Graph
         {
             get => Brushes.Black;
         }
+        private Brush DeadZone
+        {
+            get => Brushes.Red;
+        }
+        private Brush DeadZoneFill
+        {
+            get => new SolidColorBrush(Color.FromArgb(127, 255, 0, 0));
+        }
 
         private double Size
         {
@@ -47,6 +55,10 @@ namespace Graph
         private double GraphThickness
         {
             get => 1;
+        }
+        private double DeadZoneThickness
+        {
+            get => CircleThickness;
         }
 
         private double Padding
@@ -83,11 +95,29 @@ namespace Graph
 
             return new Path() { Data = new PathGeometry(new PathFigure[] { line }), Stroke = GraphColor, StrokeThickness = GraphThickness };
         }
+        private Shape GetDeadZone(double mass1, double mass2, double size, Point center)
+        {
+            var slope = Math.Sqrt(mass1 / mass2);
+            var radius = size / 2;
+            var intersectionAngle = Math.Atan(slope);
+            var intersectionPoint = center + new Vector(Math.Cos(intersectionAngle), -Math.Sin(intersectionAngle)) * radius;
+            var endPoint = center + new Vector(radius, 0);
 
-        private void InitializeView(Canvas canvas, Point center, double padding, double size)
+            var segment1 = new LineSegment(center, true);
+
+            var segment2 = new LineSegment(intersectionPoint, true);
+
+            var arcEnd = new ArcSegment(endPoint, new Size(radius, radius), 0, false, SweepDirection.Clockwise, true);
+            var sector = new PathFigure(intersectionPoint, new PathSegment[] { arcEnd, segment1, segment2 }, false);
+
+            return new Path() { Stroke = DeadZone, StrokeThickness = DeadZoneThickness, Fill = DeadZoneFill, Data = new PathGeometry(new PathFigure[] { sector }) };
+        }
+
+        private void InitializeView(Canvas canvas, (Block x, Block y) blocks, Point center, double padding, double size)
         {
             canvas.Children.Add(GetGraphCircle(center, size));
             canvas.Children.Add(GetAxises(center, padding, size));
+            canvas.Children.Add(GetDeadZone(blocks.y.Properties.Mass, blocks.x.Properties.Mass, size, center));
         }
         private double GetKineticEnergy(params Block[] blocks)
         {
@@ -110,7 +140,7 @@ namespace Graph
         {
             return new Point(NormalizeBlockVelocity(blocks.x), -NormalizeBlockVelocity(blocks.y)) + ((Vector)center);
         }
-        private void OnChanged(Block sender)
+        public void Refresh()
         {
             lock (_sync)
             {
@@ -129,10 +159,7 @@ namespace Graph
             _sync = sync;
             _lastPoint = GetCurrentPoint(Center, _blocks);
 
-            _blocks.x.OnCollide += OnChanged;
-            _blocks.y.OnCollide += OnChanged;
-
-            InitializeView(_canvas, Center, Padding, Size);
+            InitializeView(_canvas, _blocks, Center, Padding, Size);
         }
     }
 }

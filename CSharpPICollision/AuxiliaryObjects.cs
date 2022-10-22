@@ -26,12 +26,6 @@
     public record class HorizontalAxis(double Y);
 
     /// <summary>
-    /// Invoked when sender collides with another object
-    /// </summary>
-    /// <param name="sender">Collided object</param>
-    public delegate void CollideHandler(Block sender);
-
-    /// <summary>
     /// Pepresent target of <see cref="CollisionResponse"/>>
     /// </summary>
     enum CollisionTarget : int
