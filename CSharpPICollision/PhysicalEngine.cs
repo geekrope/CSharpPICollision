@@ -35,7 +35,7 @@ namespace CSharpPICollision
         /// </summary>
         public void ResetTime();
     }
-    class PhysicalEngine : IPhysicalEngine
+    public class PhysicalEngine : IPhysicalEngine
     {
         private int _timeUnit
         {
