@@ -150,7 +150,9 @@ namespace CSharpPICollision
 
             dispatcherTimer = InitializeTimer(engines.physicalEngine, cancelPhysicalEngineTask.Token, updateView);
 
-            physicalEngine = engines.physicalEngine;            
+            physicalEngine = engines.physicalEngine;
+
+            Title = $"Simulation, ratio = {blocks.Item1.Properties.Mass}/{blocks.Item2.Properties.Mass}";
         }
 
         public MainWindow() : this(1e6m, -2)

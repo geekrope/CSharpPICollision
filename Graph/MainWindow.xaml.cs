@@ -1,12 +1,11 @@
-﻿using System.Threading.Tasks;
-using System.Threading;
+﻿using System.Threading;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using CSharpPICollision;
 using System.Windows.Input;
-using System.Linq.Expressions;
+
+using CSharpPICollision;
 
 namespace Graph
 {
@@ -38,9 +37,9 @@ namespace Graph
         {
             collisions.Text = "Collsions: " + block.Collisions;
         }
-        private (Block, Block) InitializeBlocks(double mass, double speed)
+        private (Block, Block) InitializeBlocks(decimal mass, decimal speed)
         {
-            return (new Block(1, 1, 0, 2), new Block(1.5, mass, speed, 6));
+            return (new Block(1, 1, 0, 2), new Block(1.5m, mass, speed, 6));
         }
         private (IPhysicalEngine physicalEngine, GraphEngine visualEngine) InitializeEngines(Canvas canvas, (Block, Block) blocks)
         {
@@ -53,7 +52,7 @@ namespace Graph
 
             return (physicalEngine, visualEngine);
         }
-        private (double Mass, double Velocity) GetPropeties()
+        private (decimal Mass, decimal Velocity) GetPropeties()
         {
             var propetiesEditDialog = new PropertiesEditDialog();
             var result = propetiesEditDialog.ShowDialog();
@@ -80,6 +79,8 @@ namespace Graph
             dispatcherTimer = InitializeTimer(engines.physicalEngine, cancelPhysicalEngineTask.Token, UpdateView(engines.physicalEngine, blocks.Item1));
 
             dispatcherTimer.Start();
+
+            Title = $"Graph calculator, ratio = {blocks.Item1.Properties.Mass}/{blocks.Item2.Properties.Mass}";
         }
 
         private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
