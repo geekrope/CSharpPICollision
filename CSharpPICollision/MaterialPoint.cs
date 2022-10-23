@@ -5,22 +5,22 @@
     /// </summary>
     public class MaterialPoint : MaterialPointReadonly
     {
-        public double Impulse
+        public decimal Impulse
         {
             get
             {
                 return Mass * Velocity;
             }
         }
-        public double Mass
+        public decimal Mass
         {
             get; set;
         }
-        public double Velocity
+        public decimal Velocity
         {
             get; set;
         }
-        public double Position
+        public decimal Position
         {
             get; set;
         }
@@ -33,7 +33,7 @@
         /// <summary>
         /// Initializes new instance of MaterialPoint
         /// </summary>
-        public MaterialPoint(double mass, double velocity, double position)
+        public MaterialPoint(decimal mass, decimal velocity, decimal position)
         {
             this.Mass = mass;
             this.Velocity = velocity;

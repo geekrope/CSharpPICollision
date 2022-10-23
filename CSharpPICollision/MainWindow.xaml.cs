@@ -33,7 +33,7 @@ namespace CSharpPICollision
             {
                 visualEngine3D.Refresh();
 
-                collisions.Text = $"COLLISIONS: {firstBlock.Collisions}\nM = {firstBlock.Properties.Mass} \nV = {Math.Round(firstBlock.Properties.Velocity * precision) / (double)precision}";
+                collisions.Text = $"COLLISIONS: {firstBlock.Collisions}\nM = {firstBlock.Properties.Mass} \nV = {Math.Round(firstBlock.Properties.Velocity * precision) / precision}";
             };
         }
 
@@ -42,7 +42,7 @@ namespace CSharpPICollision
             controller.Camera.Transform = controller.Transform;
         }
 
-        private (double Mass, double Speed)? ShowPropertiesEditDialog()
+        private (decimal Mass, decimal Speed)? ShowPropertiesEditDialog()
         {
             var dialog = new PropertiesEditDialog();
             var result = dialog.ShowDialog();
@@ -105,9 +105,9 @@ namespace CSharpPICollision
             return timer;
         }
 
-        private (Block, Block) InitializeBlocks(double mass, double speed)
+        private (Block, Block) InitializeBlocks(decimal mass, decimal speed)
         {
-            return (new Block(1, 1, 0, 2), new Block(1.5, mass, speed, 6));
+            return (new Block(1, 1, 0, 2), new Block(1.5m, mass, speed, 6));
         }
 
         private (IPhysicalEngine physicalEngine, IVisualEngine visualEngine) InitializeEngines(CameraController cameraController, Viewport3D viewport, (Block, Block) blocks)
@@ -132,7 +132,7 @@ namespace CSharpPICollision
             dispatcherTimer.Stop();
         }
 
-        public MainWindow(double mass, double speed)
+        public MainWindow(decimal mass, decimal speed)
         {
             InitializeComponent();
 
@@ -153,7 +153,7 @@ namespace CSharpPICollision
             physicalEngine = engines.physicalEngine;            
         }
 
-        public MainWindow() : this(1e6, -2)
+        public MainWindow() : this(1e6m, -2)
         {
 
         }

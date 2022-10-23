@@ -10,7 +10,7 @@ namespace CSharpPICollision
         /// <param name="position">Segment position</param>
         /// <param name="size">Segment length</param>
         /// <returns>Segment with specific position and length</returns>
-        public static Segment GetSegment(double position, double size)
+        public static Segment GetSegment(decimal position, decimal size)
         {
             return new Segment(position, position + size);
         }
@@ -19,7 +19,7 @@ namespace CSharpPICollision
         /// </summary>
         /// <param name="segment">Segment to which method is applied</param>
         /// <returns>Length</returns>
-        public static double GetLength(Segment segment)
+        public static decimal GetLength(Segment segment)
         {
             return Math.Abs(segment.Point2 - segment.Point1);
         }
@@ -28,7 +28,7 @@ namespace CSharpPICollision
         /// </summary>
         /// <param name="segment">Segment to which method is applied</param>
         /// <returns>Point on axis</returns>
-        public static double GetCenter(Segment segment)
+        public static decimal GetCenter(Segment segment)
         {
             return (segment.Point2 + segment.Point1) / 2;
         }
@@ -38,12 +38,12 @@ namespace CSharpPICollision
         /// <param name="segment1">First segment to which method is applied</param>
         /// <param name="segment2">Second segment to which method is applied</param>
         /// <returns>Distance</returns>
-        public static double DistanceBeetweenSegments(Segment segment1, Segment segment2)
+        public static decimal DistanceBeetweenSegments(Segment segment1, Segment segment2)
         {
-            double center1 = Utils.GetCenter(segment1);
-            double center2 = Utils.GetCenter(segment2);
-            double radius1 = Utils.GetLength(segment1) / 2;
-            double radius2 = Utils.GetLength(segment2) / 2;
+            decimal center1 = Utils.GetCenter(segment1);
+            decimal center2 = Utils.GetCenter(segment2);
+            decimal radius1 = Utils.GetLength(segment1) / 2;
+            decimal radius2 = Utils.GetLength(segment2) / 2;
 
             return Utils.GetLength(new Segment(center2, center1)) - (radius1 + radius2);
         }
@@ -53,7 +53,7 @@ namespace CSharpPICollision
         /// <param name="segment">Segment to which method is applied</param>
         /// <param name="point">Point to which method is applied</param>
         /// <returns>Distance</returns>
-        public static double DistanceBeetweenSegmentAndPoint(Segment segment, double point)
+        public static decimal DistanceBeetweenSegmentAndPoint(Segment segment, decimal point)
         {
             return Utils.GetLength(new Segment(Utils.GetCenter(segment), point)) - Utils.GetLength(segment) / 2;
         }

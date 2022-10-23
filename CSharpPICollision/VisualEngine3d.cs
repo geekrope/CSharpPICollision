@@ -176,7 +176,7 @@ namespace CSharpPICollision
         /// <returns>Size of the block with scalar applied</returns>
         private Size3D GetBoxSize(Block block)
         {
-            return new Size3D(block.Size * _scalar, block.Size * _scalar, block.Size * _scalar);
+            return new Size3D((double)block.Size * _scalar, (double)block.Size * _scalar, (double)block.Size * _scalar);
         }
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace CSharpPICollision
         /// <returns>Block position in visual units</returns>
         public Point3D GetBlockPosition(Block block)
         {
-            return new Point3D(block.GetPosition() * _scalar, 0, -block.Size * _scalar / 2);
+            return new Point3D((double)block.GetPosition() * _scalar, 0, -(double)block.Size * _scalar / 2);
         }
         /// <summary>
         /// Returns wall position in visual units
@@ -294,7 +294,7 @@ namespace CSharpPICollision
         /// <returns>Wall position in visual units</returns>
         public Point3D GetWallPosition(Wall wall)
         {
-            return new Point3D(wall.GetPosition() * _scalar - _wallSize.X, 0, -_wallSize.Z / 2);
+            return new Point3D((double)wall.GetPosition() * _scalar - _wallSize.X, 0, -_wallSize.Z / 2);
         }
         /// <summary>
         /// Returns axis position in visual units
@@ -303,7 +303,7 @@ namespace CSharpPICollision
         /// <returns>Axis position in visual units</returns>
         public Point3D GetAxisPosition(HorizontalAxis axis)
         {
-            return new Point3D(0, axis.Y * _scalar, 0);
+            return new Point3D(0, (double)axis.Y * _scalar, 0);
         }
         /// <summary>
         /// Initilizes new instance of VisualEngine3D

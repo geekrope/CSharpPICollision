@@ -4,32 +4,32 @@ namespace CSharpPICollision
 {
     public class Wall : PhysicalObject
     {
-        private double _position;
+        private decimal _position;
 
         /// <summary>
         /// Returns position of wall
         /// </summary>
-        public double Position
+        public decimal Position
         {
             get => _position;
         }
         /// <summary>
         /// Returns velocity equals to zero
         /// </summary>
-        public double Velocity
+        public decimal Velocity
         {
             get => 0;
         }
 
-        public override double GetPosition(double? timeDelta = null)
+        public override decimal GetPosition(decimal? timeDelta = null)
         {
             return this._position;
         }
-        public override double GetVelocity()
+        public override decimal GetVelocity()
         {
             return Velocity;
         }
-        public override double Distance(PhysicalObject obj, double? timeDelta = null)
+        public override decimal Distance(PhysicalObject obj, decimal? timeDelta = null)
         {
             return obj switch
             {
@@ -38,15 +38,15 @@ namespace CSharpPICollision
                 _ => throw new ArgumentException("Cannot define obj type")
             };
         }
-        public override double ProcessCollision(PhysicalObject obj)
+        public override decimal ProcessCollision(PhysicalObject obj)
         {
-            return double.NaN;
+            return 0;
         }
 
         /// <summary>
         /// Initializes new instance of Wall
         /// </summary>
-        public Wall(double position)
+        public Wall(decimal position)
         {
             this._position = position;
         }

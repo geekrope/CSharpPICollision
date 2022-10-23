@@ -117,7 +117,7 @@ namespace Graph
         {
             canvas.Children.Add(GetGraphCircle(center, size));
             canvas.Children.Add(GetAxises(center, padding, size));
-            canvas.Children.Add(GetDeadZone(blocks.y.Properties.Mass, blocks.x.Properties.Mass, size, center));
+            canvas.Children.Add(GetDeadZone((double)blocks.y.Properties.Mass, (double)blocks.x.Properties.Mass, size, center));
         }
         private double GetKineticEnergy(params Block[] blocks)
         {
@@ -125,16 +125,16 @@ namespace Graph
 
             foreach (var block in blocks)
             {
-                energy += block.Properties.Mass * Math.Pow(block.GetVelocity(), 2) / 2;
+                energy += (double)block.Properties.Mass * Math.Pow((double)block.GetVelocity(), 2) / 2;
             }
 
             return energy;
         }
         private double NormalizeBlockVelocity(Block block)
         {
-            var maxVelocity = Math.Sqrt(KineticEnergy / block.Properties.Mass * 2);
+            var maxVelocity = Math.Sqrt(KineticEnergy / (double)block.Properties.Mass * 2);
 
-            return block.GetVelocity() / maxVelocity * (Size / 2);
+            return (double)block.GetVelocity() / maxVelocity * (Size / 2);
         }
         private Point GetCurrentPoint(Point center, (Block x, Block y) blocks)
         {

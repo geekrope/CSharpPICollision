@@ -8,28 +8,28 @@
         /// <summary>
         /// Returns impulse of material point
         /// </summary>
-        double Impulse
+        decimal Impulse
         {
             get;
         }
         /// <summary>
         /// Returns mass of material point
         /// </summary>
-        double Mass
+        decimal Mass
         {
             get;
         }
         /// <summary>
         /// Returns velocity of material point
         /// </summary>
-        double Velocity
+        decimal Velocity
         {
             get;
         }
         /// <summary>
         /// Returns position of material point
         /// </summary>
-        double Position
+        decimal Position
         {
             get;
         }
