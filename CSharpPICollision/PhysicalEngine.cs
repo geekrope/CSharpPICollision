@@ -137,7 +137,7 @@ namespace CSharpPICollision
                     {
                         var time = ComputeCollisionTime(object1, object2);
 
-                        if (time < timeDelta && (!collision.HasValue || (time < collision.Value.Time)))
+                        if (time <= timeDelta && (!collision.HasValue || (time <= collision.Value.Time)))
                         {
                             collision = new Collision(object1, object2, time);
                         }
